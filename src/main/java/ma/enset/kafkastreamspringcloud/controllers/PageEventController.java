@@ -2,12 +2,23 @@ package ma.enset.kafkastreamspringcloud.controllers;
 
 
 import ma.enset.kafkastreamspringcloud.events.PageEvent;
+import org.apache.kafka.streams.KeyValue;
+import org.apache.kafka.streams.state.KeyValueIterator;
+import org.apache.kafka.streams.state.QueryableStoreTypes;
+import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.binder.kafka.streams.InteractiveQueryService;
 import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 @RestController
@@ -15,6 +26,8 @@ public class PageEventController {
 
     @Autowired
     private StreamBridge streamBridge;
+    @Autowired
+    private InteractiveQueryService interactiveQueryService;
 
     @GetMapping("/publish")
     public PageEvent publish(String name, String topic){
@@ -23,11 +36,33 @@ public class PageEventController {
                 name,
                 Math.random()>0.5?"U1":"U2",
                 new Date(),
-                10 + new Random().nextInt(10000));
+                10 + new Random().nextInt(1000));
 
         streamBridge.send(topic, event);
 
         return event;
 
+    }
+
+
+    @GetMapping(value = "/analytics", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<Map<String, Long>> analytics(){
+
+        return Flux.interval(Duration.ofSeconds(1))
+                .map(
+                        seq -> {
+                            Map<String, Long> map = new HashMap<>();
+                            ReadOnlyKeyValueStore<String, Long> statics = interactiveQueryService
+                                    .getQueryableStore("count-store", QueryableStoreTypes.keyValueStore());
+                            Instant now = Instant.now();
+                            Instant from = now.minusSeconds(5);
+                            KeyValueIterator<String, Long> iter = statics.all();
+                            while (iter.hasNext()) {
+                                KeyValue<String, Long> next = iter.next();
+                                map.put(next.key, next.value);
+                            }
+                            return map;
+                        }
+                );
     }
 }

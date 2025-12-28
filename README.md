@@ -50,3 +50,7 @@ hello kafka
 
 ➡️ Tu dois voir hello kafka dans la fenêtre du consumer
 
+.\bin\windows\kafka-console-consumer.bat --topic T3 --bootstrap-server localhost:9092 --from-beginning --property print.key=true --key-deserializer org.apache.kafka.common.serialization.StringDeserializer --value-deserializer org.apache.kafka.common.serialization.LongDeserializer
+
+
+.\bin\windows\kafka-console-consumer.bat --topic T4 --bootstrap-server localhost:9092 --property print.key=true --key-deserializer org.apache.kafka.common.serialization.StringDeserializer --value-deserializer org.apache.kafka.common.serialization.LongDeserializer
