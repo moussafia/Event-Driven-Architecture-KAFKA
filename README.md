@@ -8,15 +8,13 @@ In the <strong>Topic</strong> model, when consumers are connected to a broker,
 each message sent to the topic is delivered to <strong>all connected consumers</strong>.
 </p>
 
-<img src="topic.png" alt="Topic model">
-
 <h3>Queue (One-to-One)</h3>
 <p>
 In the <strong>Queue</strong> model, each message is delivered to <strong>only one consumer</strong>,
 in the order the consumers are connected.
 </p>
 
-<img src="queue.png" alt="Queue model">
+<img src="images/broker-arch.jpg" alt="broker arch">
 
 <p>
 <strong>Broker role:</strong> receive, store, and deliver messages to consumers.
@@ -35,13 +33,11 @@ as soon as it connects, then removed from the broker.
 <p><strong>Disadvantage:</strong> the broker pushes all messages even if the consumer
 does not have enough resources to process them.</p>
 
-<h3>Pull (Poll) Model (Kafka)</h3>
+<h3>Pull Model (Kafka)</h3>
 <p>
-Kafka uses the <strong>pull (poll)</strong> model: consumers request messages when they are ready.
+Kafka uses the <strong>pull</strong> model: consumers request messages when they are ready.
 This gives better control over processing speed.
 </p>
-
-<img src="push-pull.png" alt="Push vs Pull">
 
 <hr>
 
@@ -91,13 +87,19 @@ Kafka consumers work in <strong>consumer groups</strong>.
 
 <h3>Simple Example</h3>
 <p>
-Imagine a book with 200 pages:
+Imagine a book with 200,000 pages:
 </p>
 
 <ol>
-    <li>Partitioning: split the book into 200 partitions</li>
-    <li>Replication: duplicate partitions for fault tolerance</li>
-    <li>Scalability: start or stop consumers dynamically</li>
+    <li>
+        <strong>Partitioning:</strong> split the book into multiple partitions to distribute the data across the cluster.
+    </li>
+    <li>
+        <strong>Replication:</strong> duplicate partitions on different nodes to ensure fault tolerance.
+    </li>
+    <li>
+        <strong>Scalability:</strong> when a broker is added or removed, partitions can be reassigned across the cluster to balance the data and processing load.
+    </li>
 </ol>
 
 <hr>
@@ -114,7 +116,7 @@ ZooKeeper acts as a <strong>coordinator</strong> between Kafka cluster instances
     <li>Handles scalability and leader election</li>
 </ul>
 
-<img src="zookeeper.png" alt="ZooKeeper coordination">
+<img src="images/kafka-arch.jpg" alt="kafka">
 
 <hr>
 
@@ -203,10 +205,10 @@ Consumes messages while displaying keys and deserializing values.
 <p>
 Producer and consumer connected to <strong>test-topic</strong>.
 </p>
-<img src="demo1.png" alt="Producer Consumer Demo">
+<img src="images/kafka-demo.jpg" alt="Producer Consumer Demo">
 
 <h3>Demo 2: Real-Time Web Application</h3>
 <p>
 Web application displaying <strong>real-time stream analytics</strong>.
 </p>
-<img src="demo2.png" alt="Web Stream Analytics">
+<img src="images/smoothieJs.jpg" alt="Web Stream Analytics">
