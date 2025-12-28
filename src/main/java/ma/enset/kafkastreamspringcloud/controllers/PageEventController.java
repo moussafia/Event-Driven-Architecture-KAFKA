@@ -3,9 +3,11 @@ package ma.enset.kafkastreamspringcloud.controllers;
 
 import ma.enset.kafkastreamspringcloud.events.PageEvent;
 import org.apache.kafka.streams.KeyValue;
+import org.apache.kafka.streams.kstream.Windowed;
 import org.apache.kafka.streams.state.KeyValueIterator;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
+import org.apache.kafka.streams.state.ReadOnlyWindowStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.binder.kafka.streams.InteractiveQueryService;
 import org.springframework.cloud.stream.function.StreamBridge;
@@ -52,14 +54,14 @@ public class PageEventController {
                 .map(
                         seq -> {
                             Map<String, Long> map = new HashMap<>();
-                            ReadOnlyKeyValueStore<String, Long> statics = interactiveQueryService
-                                    .getQueryableStore("count-store", QueryableStoreTypes.keyValueStore());
+                            ReadOnlyWindowStore<String, Long> statics = interactiveQueryService
+                                    .getQueryableStore("count-store", QueryableStoreTypes.windowStore());
                             Instant now = Instant.now();
                             Instant from = now.minusSeconds(5);
-                            KeyValueIterator<String, Long> iter = statics.all();
+                            KeyValueIterator<Windowed<String>, Long> iter = statics.fetchAll(from, now);
                             while (iter.hasNext()) {
-                                KeyValue<String, Long> next = iter.next();
-                                map.put(next.key, next.value);
+                                KeyValue<Windowed<String>, Long> next = iter.next();
+                                map.put(next.key.key(), next.value);
                             }
                             return map;
                         }

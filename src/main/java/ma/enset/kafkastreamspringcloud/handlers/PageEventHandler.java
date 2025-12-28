@@ -52,7 +52,7 @@ public class PageEventHandler {
                     .filter((k,v) -> v.duration() > 100)
                     .map((k,v) -> new KeyValue<>(v.name(), v.duration()))
                     .groupByKey(Grouped.with(Serdes.String(), Serdes.Long()))
-                    .windowedBy(TimeWindows.of(Duration.ofSeconds(5))) //cont 5 seconde dernier, fenetrage
+                    .windowedBy(TimeWindows.of(Duration.ofSeconds(30))) //cont 5 seconde dernier, fenetrage
                     .count(Materialized.as("count-store"))
                    // .aggregate(()->0.0,(k,v, total)->total+v,Materialized.as("total-store"))
                     .toStream()
