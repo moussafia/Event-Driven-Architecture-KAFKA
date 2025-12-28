@@ -1,56 +1,212 @@
-<h2>Kafka cmd</h2>
+<h1>Event-Driven Architecture: JMS & Kafka</h1>
 
+<h2>1. Messaging Models</h2>
 
-UUID
+<h3>Topic (One-to-Many)</h3>
+<p>
+In the <strong>Topic</strong> model, when consumers are connected to a broker,
+each message sent to the topic is delivered to <strong>all connected consumers</strong>.
+</p>
 
-JRBzyPS2T6yG0Q_44gRMRQ
+<img src="topic.png" alt="Topic model">
 
+<h3>Queue (One-to-One)</h3>
+<p>
+In the <strong>Queue</strong> model, each message is delivered to <strong>only one consumer</strong>,
+in the order the consumers are connected.
+</p>
 
-→ ID du cluster KRaft.
+<img src="queue.png" alt="Queue model">
 
-Format du stockage
+<p>
+<strong>Broker role:</strong> receive, store, and deliver messages to consumers.
+</p>
 
-.\bin\windows\kafka-storage.bat format -t JRBzyPS2T6yG0Q_44gRMRQ -c .\config\kraft\server.properties
+<hr>
 
+<h2>2. Message Delivery Techniques</h2>
 
-→ Initialise le log Kafka (obligatoire la première fois).
+<h3>Push Model (JMS)</h3>
+<p>
+In the <strong>push</strong> model, messages are sent automatically to the consumer
+as soon as it connects, then removed from the broker.
+</p>
 
+<p><strong>Disadvantage:</strong> the broker pushes all messages even if the consumer
+does not have enough resources to process them.</p>
 
+<h3>Pull (Poll) Model (Kafka)</h3>
+<p>
+Kafka uses the <strong>pull (poll)</strong> model: consumers request messages when they are ready.
+This gives better control over processing speed.
+</p>
 
-Démarrer Zookeeper
-.\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
+<img src="push-pull.png" alt="Push vs Pull">
 
+<hr>
 
-➡️ Laisser la fenêtre ouverte
+<h2>3. Apache Kafka Overview</h2>
 
-3️⃣ Démarrer Kafka Server
+<p>
+Apache Kafka is used for communication between <strong>distributed applications</strong>.
+</p>
 
-Dans une nouvelle fenêtre CMD :
+<ul>
+    <li>Acts as an <strong>Event Store</strong> (stores events produced by applications)</li>
+    <li>Plays the role of a <strong>broker</strong> like JMS or RabbitMQ</li>
+    <li>Stores data in a <strong>durable</strong> and <strong>fault-tolerant</strong> way</li>
+    <li>Supports <strong>real-time stream processing</strong></li>
+</ul>
 
-.\bin\windows\kafka-server-start.bat .\config\server.properties
+<h3>Processing Types</h3>
 
+<ul>
+    <li><strong>Stream Processing:</strong> process data in real time</li>
+    <li><strong>Batch Processing:</strong> process historical data (analytics, statistics)</li>
+</ul>
 
-➡️ Laisser la fenêtre ouverte
+<p>
+Kafka is <strong>not a Big Data storage system</strong>.
+</p>
 
-4️⃣ Tester Producer / Consumer
-a) Créer un topic
-.\bin\windows\kafka-topics.bat --create --topic test-topic --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+<h3>Big Data Tools</h3>
+<ul>
+    <li><strong>MapReduce:</strong> old model</li>
+    <li><strong>Spark + HDFS:</strong> modern Big Data processing</li>
+</ul>
 
-b) Lancer le consumer
-.\bin\windows\kafka-console-consumer.bat --topic test-topic --bootstrap-server localhost:9092 --from-beginning
+<hr>
 
-c) Lancer le producer
-.\bin\windows\kafka-console-producer.bat --topic test-topic --bootstrap-server localhost:9092
+<h2>4. Kafka Consumers and Consumer Groups</h2>
 
+<p>
+Kafka consumers work in <strong>consumer groups</strong>.
+</p>
 
-➡️ Tape un message :
+<ul>
+    <li>Each partition is consumed by only one consumer in a group</li>
+    <li>Multiple consumers in one group = <strong>Queue behavior</strong></li>
+    <li>Multiple groups on the same topic = <strong>Topic behavior</strong></li>
+</ul>
 
-hello kafka
+<h3>Simple Example</h3>
+<p>
+Imagine a book with 200 pages:
+</p>
 
+<ol>
+    <li>Partitioning: split the book into 200 partitions</li>
+    <li>Replication: duplicate partitions for fault tolerance</li>
+    <li>Scalability: start or stop consumers dynamically</li>
+</ol>
 
-➡️ Tu dois voir hello kafka dans la fenêtre du consumer
+<hr>
 
-.\bin\windows\kafka-console-consumer.bat --topic T3 --bootstrap-server localhost:9092 --from-beginning --property print.key=true --key-deserializer org.apache.kafka.common.serialization.StringDeserializer --value-deserializer org.apache.kafka.common.serialization.LongDeserializer
+<h2>5. ZooKeeper</h2>
 
+<p>
+ZooKeeper acts as a <strong>coordinator</strong> between Kafka cluster instances.
+</p>
 
-.\bin\windows\kafka-console-consumer.bat --topic T4 --bootstrap-server localhost:9092 --property print.key=true --key-deserializer org.apache.kafka.common.serialization.StringDeserializer --value-deserializer org.apache.kafka.common.serialization.LongDeserializer
+<ul>
+    <li>Manages partition distribution</li>
+    <li>Ensures replication</li>
+    <li>Handles scalability and leader election</li>
+</ul>
+
+<img src="zookeeper.png" alt="ZooKeeper coordination">
+
+<hr>
+
+<h2>6. Kafka APIs</h2>
+
+<ul>
+    <li><strong>Producer API:</strong> send messages to Kafka</li>
+    <li><strong>Consumer API:</strong> read messages from Kafka</li>
+    <li><strong>Streams API:</strong> real-time stream processing</li>
+    <li><strong>Connect API:</strong> integrate Kafka with external systems (MongoDB, databases, etc.)</li>
+</ul>
+
+<hr>
+
+<h2>7. Kafka Commands Used in the Project</h2>
+
+<h3>Cluster UUID</h3>
+<p>
+<strong>JRBzyPS2T6yG0Q_44gRMRQ</strong> — Unique identifier of the Kafka KRaft cluster.
+</p>
+
+<h3>Format Kafka Storage</h3>
+<pre>
+kafka-storage.bat format -t JRBzyPS2T6yG0Q_44gRMRQ -c server.properties
+</pre>
+<p>
+Initializes Kafka log storage (required on first startup).
+</p>
+
+<h3>Start ZooKeeper</h3>
+<pre>
+zookeeper-server-start.bat zookeeper.properties
+</pre>
+<p>
+Starts ZooKeeper coordination service (keep the window open).
+</p>
+
+<h3>Start Kafka Server</h3>
+<pre>
+kafka-server-start.bat server.properties
+</pre>
+<p>
+Starts the Kafka broker.
+</p>
+
+<h3>Create Topic</h3>
+<pre>
+kafka-topics.bat --create --topic test-topic --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+</pre>
+<p>
+Creates a topic with one partition and one replica.
+</p>
+
+<h3>Start Consumer</h3>
+<pre>
+kafka-console-consumer.bat --topic test-topic --bootstrap-server localhost:9092 --from-beginning
+</pre>
+<p>
+Reads all messages from the beginning of the topic.
+</p>
+
+<h3>Start Producer</h3>
+<pre>
+kafka-console-producer.bat --topic test-topic --bootstrap-server localhost:9092
+</pre>
+<p>
+Sends messages to the topic.
+</p>
+
+<h3>Consumer with Key and Deserializers</h3>
+<pre>
+kafka-console-consumer.bat --topic T3 --bootstrap-server localhost:9092
+--from-beginning --property print.key=true
+--key-deserializer StringDeserializer
+--value-deserializer LongDeserializer
+</pre>
+<p>
+Consumes messages while displaying keys and deserializing values.
+</p>
+
+<hr>
+
+<h2>8. Project Demos</h2>
+
+<h3>Demo 1: Producer & Consumer</h3>
+<p>
+Producer and consumer connected to <strong>test-topic</strong>.
+</p>
+<img src="demo1.png" alt="Producer Consumer Demo">
+
+<h3>Demo 2: Real-Time Web Application</h3>
+<p>
+Web application displaying <strong>real-time stream analytics</strong>.
+</p>
+<img src="demo2.png" alt="Web Stream Analytics">
